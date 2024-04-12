@@ -1,7 +1,7 @@
 # Compiler settings - Can change according to need
 CC := gcc
 CFLAGS := -Wall -Wextra -g -Iinclude
-LIBRARIES := -lglfw -lGL -lGLEW
+LIBRARIES := -lglfw
 
 # Project structure
 APP_NAME := 3rd-manifold-space
