@@ -1,9 +1,22 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include "constants.h"
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    UNUSED(window);
+    glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+}
 
 int main() {
     if (!glfwInit()) {
@@ -34,27 +47,23 @@ int main() {
         return -1;
     }
     glfwMakeContextCurrent(window); // Initialize GLEW
-    if (glewInit() != GLEW_OK) {
-        fprintf(stderr, "Failed to initialize GLEW\n");
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        fprintf(stderr, "Failed to initialize OpenGL context\n");
         return -1;
+    }    
+
+    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    // Set callback function to resize viewport
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    while(!glfwWindowShouldClose(window))
+    {
+        processInput(window);
+        glfwPollEvents();
+        glfwSwapBuffers(window);
     }
 
-    // Ensure we can capture the escape key being pressed below
-    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-
-    do {
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // DRAW HERE
-
-        // Swap buffers
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-
-    } while (
-        glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && 
-        glfwWindowShouldClose(window) == 0
-    );
-
+    glfwTerminate();
     return 0;
 }

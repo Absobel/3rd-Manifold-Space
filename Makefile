@@ -1,6 +1,6 @@
 # Compiler settings - Can change according to need
 CC := gcc
-CFLAGS := -Wall -Wextra -g
+CFLAGS := -Wall -Wextra -g -Iinclude
 LIBRARIES := -lglfw -lGL -lGLEW
 
 # Project structure
