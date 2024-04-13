@@ -3,6 +3,10 @@
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
     "files.associations": {
-        "glew.h": "c"
+        "glew.h": "c",
+        "utils.h": "c",
+        "stdio.h": "c"
     },
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
 }

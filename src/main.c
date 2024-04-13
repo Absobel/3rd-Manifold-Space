@@ -3,7 +3,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "constants.h"
+#include "globals.h"
+#include "game.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -11,14 +12,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }
-}
-
 int main() {
+    printf("\n///////// STARTING /////////\n");
+
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");
         return -1;
@@ -57,13 +53,19 @@ int main() {
     // Set callback function to resize viewport
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    InitData init_data = init_game(window);
+
     while(!glfwWindowShouldClose(window))
     {
-        processInput(window);
+        game_loop(window, init_data);
+
+        glfwSwapBuffers(window); 
         glfwPollEvents();
-        glfwSwapBuffers(window);
     }
 
+    delete_game(init_data);
     glfwTerminate();
+
+    printf("///////// ENDING   /////////\n");
     return 0;
 }
