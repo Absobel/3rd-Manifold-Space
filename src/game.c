@@ -96,15 +96,13 @@ InitData init_game(GLFWwindow *window) {
     };
 }
 
-void processInput(GLFWwindow *window)
-{
+void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
 }
 
-void game_loop(GLFWwindow *window, InitData init_data)
-{
+void game_loop(GLFWwindow *window, InitData init_data) {
     processInput(window);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -116,10 +114,8 @@ void game_loop(GLFWwindow *window, InitData init_data)
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-void delete_game(InitData init_data)
-{
+void delete_game(InitData init_data) {
     glDeleteVertexArrays(1, &init_data.VAO);
     glDeleteBuffers(1, &init_data.STATIC_VBO);
     glDeleteProgram(init_data.shader_program_id);
-
 }
