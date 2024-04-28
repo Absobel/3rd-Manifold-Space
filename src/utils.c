@@ -3,6 +3,7 @@
 
 #include "utils.h"
 
+// TODO : Add error handling
 char *read_file(const char *filename) {
     FILE *file = fopen(filename, "r");
     if (file == NULL) {

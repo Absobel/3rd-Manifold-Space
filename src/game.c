@@ -7,6 +7,7 @@
 #include "globals.h"
 #include "utils.h"
 
+// TODO : Add error handling
 uint32_t shader_program() {
     int success;
     char info_log[512];
@@ -62,35 +63,47 @@ InitData init_game(GLFWwindow *window) {
 
     uint32_t shader_program_id = shader_program();
 
-    // Actual data
-
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f
-    };
-
-    // VAO
+    // Init Objects
     uint32_t VAO;
     glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    // VBOs
     uint32_t STATIC_VBO;
     glGenBuffers(1, &STATIC_VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, STATIC_VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    uint32_t EBO;
+    glGenBuffers(1, &EBO);
 
+
+    // Actual data
+    float vertices[] = {
+        0.5f,  0.5f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left 
+    };
+    uint32_t indices[] = {  // note that we start from 0!
+        0, 1, 3,   // first triangle
+        1, 2, 3    // second triangle
+    };  
+
+    // Bind objects
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, STATIC_VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    
+    // Donne les infos sur les données
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // Donne l'info d'à quoi ressemble une donnée via l'id 0 défini par le vertex shader
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-
-    // No more VAO
-    glBindVertexArray(0);
+    // Unbinding objects
+    glBindVertexArray(0); // VAO
+    glBindBuffer(GL_ARRAY_BUFFER, 0); // VBO (could be unbound whenever)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // EBO (must be unbound after VAO)
 
     return (InitData) {
         .shader_program_id = shader_program_id,
+        .EBO = EBO,
         .STATIC_VBO = STATIC_VBO,
         .VAO = VAO
     };
@@ -104,18 +117,29 @@ void processInput(GLFWwindow *window) {
 
 void game_loop(GLFWwindow *window, InitData init_data) {
     processInput(window);
-
+    // Init game loop
+    glUseProgram(init_data.shader_program_id);
+    glBindVertexArray(init_data.VAO);
+    // Clear screen
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(init_data.shader_program_id);
-    glBindVertexArray(init_data.VAO);
+    // Actual drawing
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // Error handling
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        fprintf(stderr, "OpenGL Error: %d\n", error);
+    }
+
+    // End game loop
+    glBindVertexArray(0);
 }
 
 void delete_game(InitData init_data) {
     glDeleteVertexArrays(1, &init_data.VAO);
     glDeleteBuffers(1, &init_data.STATIC_VBO);
+    glDeleteBuffers(1, &init_data.EBO);
     glDeleteProgram(init_data.shader_program_id);
 }

@@ -5,6 +5,7 @@
 
 typedef struct {
     uint32_t shader_program_id;
+    uint32_t EBO;
     uint32_t STATIC_VBO;
     uint32_t VAO;
 } InitData;
